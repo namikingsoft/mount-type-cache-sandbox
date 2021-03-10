@@ -28,9 +28,8 @@ jobs:
         id: exists-cache
         run: |
           if [ -d /tmp/buildx-cache ]; then
-            rm -rf /tmp/buildx-cache
-            # ls -al /tmp/buildx-cache
-            # echo "::set-output name=buildx::$(test -d /tmp/buildx-cache && echo true)"
+            ls -al /tmp/buildx-cache
+            echo "::set-output name=buildx::$(test -d /tmp/buildx-cache && echo true)"
           fi
       - name: Restore buildkit cache
         # cache-hit is true only equals key exactly
