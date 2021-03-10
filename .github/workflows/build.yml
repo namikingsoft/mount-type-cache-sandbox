@@ -25,7 +25,6 @@ jobs:
       - name: Exists cache
         id: exists-cache
         run: echo "::set-output name=buildx::$(test -d /tmp/buildx-cache && echo true)"
-      - run: echo test ${{ steps.buildx-cache.outputs.cache-hit }}
       - name: Restore buildkit cache
         # cache-hit is true only equals key exactly
         # if: steps.buildx-cache.outputs.cache-hit == 'true'
