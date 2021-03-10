@@ -39,9 +39,9 @@ jobs:
           context: .
           push: false
           cache-from: |
-            type=local,src=/tmp/buildx-cache/buildx
+            type=local,src=/tmp/buildx-cache/layer
           cache-to: |
-            type=local,mode=max,dest=/tmp/buildx-cache/buildx
+            type=local,mode=max,dest=/tmp/buildx-cache/layer
           tags: |
             app:latest
       - name: Backup buildx cache
@@ -61,6 +61,6 @@ jobs:
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
             alpine /bin/sh -c "cd / && tar cf /backup/mount.tar.gz /var/lib/buildkit"
+      - run: docker run --rm app
       - uses: mxschmitt/action-tmate@v3
         if: ${{ failure() }}
-      - run: echo ${{ steps.docker_build.outputs.digest }}
