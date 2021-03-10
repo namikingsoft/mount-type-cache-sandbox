@@ -36,7 +36,7 @@ jobs:
           docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
-            alpine tar xvf /backup/mount.tar.gz -C /var/lib
+            alpine tar xvf /backup/buildkit.tar.gz -C /var/lib
           docker buildx inspect --builder ${{ steps.docker-builder.outputs.name }} --bootstrap
           echo && echo "============ After restoring"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
