@@ -15,7 +15,9 @@ jobs:
         run: |
           echo "::set-output name=yearmonth::$(/bin/date -u "+%Y%m")"
           echo "::set-output name=timestamp::$(/bin/date -u "+%s")"
-        shell: bash
+      - name: Get builder
+        id: get-builder
+        run: echo "::set-output name=container::buildx_buildkit_${{ steps.docker-builder.outputs.name }}0"
       - uses: actions/cache@v2
         with:
           key: ${{ runner.os }}-buildx002-${{ steps.get-date.outputs.yearmonth }}-${{ steps.get-date.outputs.timestamp }}
@@ -31,15 +33,15 @@ jobs:
         if: steps.exists-cache.outputs.buildx == 'true'
         run: |
           echo && echo "============ Before restoring"
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
+          docker buildx du --verbose
           echo && echo "============ Restore buildkit cache"
-          docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
-          docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
+          docker buildx stop
+          docker run --rm --volumes-from ${{ steps.get-builder.outputs.container }} \
             -v /tmp/buildx-cache:/backup \
             alpine tar xvf /backup/buildkit.tar.gz -C /var/lib
-          docker buildx inspect --builder ${{ steps.docker-builder.outputs.name }} --bootstrap
+          docker buildx inspect --bootstrap
           echo && echo "============ After restoring"
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
+          docker buildx du --verbose
       - uses: docker/build-push-action@v2
         id: docker_build
         with:
@@ -57,16 +59,16 @@ jobs:
           KEEP_STORAGE: 1073741824 # this is 1GB
         run: |
           echo && echo "============ Before pruning"
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
+          docker buildx du --verbose
           echo && echo "============ Start pruning"
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=frontend
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=regular
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=source.local 
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --keep-storage ${KEEP_STORAGE}
+          docker buildx prune --force --filter type=frontend
+          docker buildx prune --force --filter type=regular
+          docker buildx prune --force --filter type=source.local 
+          docker buildx prune --force --keep-storage ${KEEP_STORAGE}
           echo && echo "============ After pruning"
-          docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
+          docker buildx du --verbose
           echo && echo "============ Backup buildkit cache"
-          docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
+          docker run --rm --volumes-from ${{ steps.get-builder.outputs.container }} \
             -v /tmp/buildx-cache:/backup \
             alpine tar cvf /backup/buildkit.tar.gz -C /var/lib buildkit
       # - uses: mxschmitt/action-tmate@v3
