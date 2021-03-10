@@ -19,17 +19,18 @@ jobs:
       - uses: actions/cache@v2
         id: buildx-cache
         with:
-          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-${{ steps.get-date.outputs.timestamp }}
+          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-
+            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}
           path: /tmp/buildx-cache
+      - run: echo test ${{ steps.buildx-cache.outputs.cache-hit }}
       - name: Restore buildx cache
         if: steps.buildx-cache.outputs.cache-hit == 'true'
         run: |
           docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
-            alpine /bin/sh -c "cd / && tar xf /backup/mount.tar.gz"
+            alpine /bin/sh -c "cd / && tar xvf /backup/mount.tar.gz"
           docker buildx inspect --builder ${{ steps.docker-builder.outputs.name }} --bootstrap
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
       - uses: docker/build-push-action@v2
@@ -60,7 +61,6 @@ jobs:
           echo "============ Backup buildx cache"
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
-            alpine /bin/sh -c "cd / && tar cf /backup/mount.tar.gz /var/lib/buildkit"
-      - run: docker run --rm app
+            alpine /bin/sh -c "cd / && tar cvf /backup/mount.tar.gz /var/lib/buildkit"
       - uses: mxschmitt/action-tmate@v3
         if: ${{ failure() }}
