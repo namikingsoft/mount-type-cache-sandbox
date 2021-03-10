@@ -18,9 +18,9 @@ jobs:
         shell: bash
       - uses: actions/cache@v2
         with:
-          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-${{ steps.get-date.outputs.timestamp }}
+          key: ${{ runner.os }}-buildx001-${{ steps.get-date.outputs.yearmonth }}-${{ steps.get-date.outputs.timestamp }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-
+            ${{ runner.os }}-buildx001-${{ steps.get-date.outputs.yearmonth }}-
           path: /tmp/buildx-cache
       - name: Exists cache
         id: exists-cache
