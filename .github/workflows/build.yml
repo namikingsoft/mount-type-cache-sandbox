@@ -17,15 +17,19 @@ jobs:
           echo "::set-output name=timestamp::$(/bin/date -u "+%s")"
         shell: bash
       - uses: actions/cache@v2
-        id: buildx-cache
         with:
-          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}
+          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-${{ steps.get-date.outputs.timestamp }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}
+            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-
           path: /tmp/buildx-cache
+      - name: Exists cache
+        id: exists-cache
+        run: echo "::set-output name=buildx::$(test -d /tmp/buildx-cache && echo true)"
       - run: echo test ${{ steps.buildx-cache.outputs.cache-hit }}
       - name: Restore buildx cache
-        if: steps.buildx-cache.outputs.cache-hit == 'true'
+        # cache-hit is true only equals key exactly
+        # if: steps.buildx-cache.outputs.cache-hit == 'true'
+        if: steps.exists-cache.outputs.buildx == 'true'
         run: |
           docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
