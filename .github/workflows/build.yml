@@ -26,7 +26,7 @@ jobs:
         id: exists-cache
         run: echo "::set-output name=buildx::$(test -d /tmp/buildx-cache && echo true)"
       - run: echo test ${{ steps.buildx-cache.outputs.cache-hit }}
-      - name: Restore buildx cache
+      - name: Restore buildkit cache
         # cache-hit is true only equals key exactly
         # if: steps.buildx-cache.outputs.cache-hit == 'true'
         if: steps.exists-cache.outputs.buildx == 'true'
@@ -49,7 +49,7 @@ jobs:
             type=local,mode=max,dest=/tmp/buildx-cache/layer
           tags: |
             app:latest
-      - name: Backup buildx cache
+      - name: Backup buildkit cache
         env:
           KEEP_STORAGE: 1073741824 # this is 1GB
         run: |
@@ -66,5 +66,6 @@ jobs:
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
             alpine tar cvf /backup/buildkit.tar.gz -C /var/lib buildkit
+          la -al /tmp/buildx-cache
       # - uses: mxschmitt/action-tmate@v3
       #   if: ${{ failure() }}
