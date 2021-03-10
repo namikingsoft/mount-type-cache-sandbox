@@ -31,11 +31,14 @@ jobs:
         # if: steps.buildx-cache.outputs.cache-hit == 'true'
         if: steps.exists-cache.outputs.buildx == 'true'
         run: |
+          echo && echo "============ Before restoring"
+          docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
           docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
-            alpine sh -c "rm -rf /var/lib/buildkit && tar xvf /backup/mount.tar.gz -C /var/lib"
+            alpine tar xvf /backup/mount.tar.gz -C /var/lib
           docker buildx inspect --builder ${{ steps.docker-builder.outputs.name }} --bootstrap
+          echo && echo "============ After restoring"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
       - uses: docker/build-push-action@v2
         id: docker_build
