@@ -66,5 +66,5 @@ jobs:
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
             alpine /bin/sh -c "cd / && tar cvf /backup/mount.tar.gz /var/lib/buildkit"
-      - uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() }}
+      # - uses: mxschmitt/action-tmate@v3
+      #   if: ${{ failure() }}
