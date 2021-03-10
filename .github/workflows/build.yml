@@ -32,6 +32,7 @@ jobs:
         run: |
           echo && echo "============ Before restoring"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
+          echo && echo "============ Restore buildkit cache"
           docker buildx stop --builder ${{ steps.docker-builder.outputs.name }}
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
@@ -64,7 +65,7 @@ jobs:
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --keep-storage ${KEEP_STORAGE}
           echo && echo "============ After pruning"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
-          echo && echo "============ Backup buildx cache"
+          echo && echo "============ Backup buildkit cache"
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
             alpine tar cvf /backup/buildkit.tar.gz -C /var/lib buildkit
