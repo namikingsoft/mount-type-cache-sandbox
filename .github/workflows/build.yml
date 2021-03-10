@@ -53,16 +53,16 @@ jobs:
         env:
           KEEP_STORAGE: 1073741824 # this is 1GB
         run: |
-          echo "============ Before pruning"
+          echo && echo "============ Before pruning"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
-          echo "============ Start pruning"
+          echo && echo "============ Start pruning"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=frontend
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=regular
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --filter type=source.local 
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} prune --force --keep-storage ${KEEP_STORAGE}
-          echo "============ After pruning"
+          echo && echo "============ After pruning"
           docker buildx --builder ${{ steps.docker-builder.outputs.name }} du --verbose
-          echo "============ Backup buildx cache"
+          echo && echo "============ Backup buildx cache"
           docker run --rm --volumes-from buildx_buildkit_${{ steps.docker-builder.outputs.name }}0 \
             -v /tmp/buildx-cache:/backup \
             alpine /bin/sh -c "cd / && tar cvf /backup/mount.tar.gz /var/lib/buildkit"
