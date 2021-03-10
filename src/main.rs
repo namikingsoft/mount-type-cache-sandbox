@@ -3,7 +3,7 @@ extern crate serde_json;
 
 fn main() {
   let json = json!({
-    "hello": "cache"
+    "hello": "cache!"
   });
   println!("{:?}", json);
 }
