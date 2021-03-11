@@ -2,8 +2,8 @@
 extern crate serde_json;
 
 fn main() {
-  let json = json!({
-    "hello": "cache!"
-  });
-  println!("{:?}", json);
+    let json = json!({
+        "hello": "cache!"
+    });
+    println!("{:?}", json);
 }
