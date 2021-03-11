@@ -3,11 +3,9 @@
 FROM rust:1.50-slim-buster AS rust-base
 ENV CARGO_INCREMENTAL=0
 ENV RUSTC_WRAPPER=/usr/local/bin/sccache
-WORKDIR /tmp/sccache
+WORKDIR /usr/local/bin
 ADD https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz .
-RUN tar xzf sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz --strip-components 1 \
-  && chmod +x sccache \
-  && mv sccache /usr/local/bin
+RUN tar xzf sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz --strip-components 1 && chmod +x sccache
 
 FROM rust-base AS rust-builder
 WORKDIR /app

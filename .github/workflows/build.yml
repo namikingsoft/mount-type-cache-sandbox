@@ -20,9 +20,9 @@ jobs:
         run: echo "::set-output name=container::buildx_buildkit_${{ steps.docker-builder.outputs.name }}0"
       - uses: actions/cache@v2
         with:
-          key: ${{ runner.os }}-buildx-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-buildx-${{ steps.get-date.outputs.yearmonth }}-
           path: /tmp/buildx-cache
       - name: Exists cache
         id: exists-cache
